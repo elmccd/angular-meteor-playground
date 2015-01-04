@@ -2,22 +2,54 @@ Parties = new Mongo.Collection("parties");
 
 if (Meteor.isClient) {
 
-  angular.module('party', ['angular-meteor', 'monospaced.elastic']);
+  angular.module('party', ['angular-meteor', 'monospaced.elastic', 'ui.router']);
+
+  angular.module("party").config(['$stateProvider', '$urlRouterProvider',
+    function ($stateProvider, $urlRouterProvider) {
+      $urlRouterProvider.otherwise("/");
+
+      $stateProvider
+          .state('home', {
+            url: "/",
+            template: UiRouter.template('home.html')
+          })
+          .state('login', {
+            url: "/login",
+            template: UiRouter.template('login.html')
+          })
+          .state('chat', {
+            url: "/chat",
+            template: UiRouter.template('chat.html'),
+            controller: 'PartiesController'
+          })
+          .state('logout', {
+            url: "/logout",
+            controller: ['$location', function ($state) {
+              Meteor.logout();
+              $state.go('home')
+            }]
+          });
+    }
+  ]);
 
   Meteor.startup(function () {
     angular.bootstrap(document, ['party']);
-    $.material.init();
   });
 
   angular.module('party')
       .run(function ($rootScope) {
 
         window.$rootScope = $rootScope;
-        $rootScope.logIn = function () {
+        $rootScope.loginWithGoogle = function () {
           return Meteor.loginWithGoogle();
         }
       })
-      .controller('PartiesController', function ($scope, $collection) {
+      .controller('PartiesController', function ($scope, $collection, $timeout) {
+
+        $timeout(function () {
+          $.material.init();
+          $('[data-toggle]').tooltip();
+        });
 
         $scope.parties = [];
         $scope.errors = {
@@ -30,7 +62,11 @@ if (Meteor.isClient) {
         $scope.userName = '';
         $scope.message = '';
 
-        $scope.add = function (val) {
+        $scope.submitOnEnter = false;
+
+        $scope.add = function () {
+
+          console.log($scope);
           if ($scope.message === '') {
             $scope.errors.items.message = true;
             $scope.errors.length += 1;
@@ -60,7 +96,17 @@ if (Meteor.isClient) {
             items: {}
           };
 
+        };
+
+        $scope.messageKeyDown = function (event) {
+          if (event.which === 13 && $scope.submitOnEnter) {
+            event.preventDefault();
+
+            $scope.add();
+            return false;
+          }
         }
+
       });
 
   angular.module('party').filter("nl2br", function($sce) {
@@ -88,26 +134,11 @@ if (Meteor.isClient) {
     }
   });
 
-
-  // counter starts at 0
-  Session.setDefault("counter", 0);
-
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get("counter");
-    }
-  });
-
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set("counter", Session.get("counter") + 1);
-    }
-  });
 }
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
+    Parties.remove({});
     if (Parties.find().count() === 0) {
 
       var parties = [];

@@ -1,5 +1,5 @@
 <head>
-  <title>lax</title>
+    <title>lax</title>
 </head>
 
 <body>
@@ -7,128 +7,61 @@
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand btn btn-primary btn-link">Brand</a>
+            <a class="navbar-brand" ui-sref="home">
+                <i class="fa fa-weixin"></i>
+                Smack
+            </a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active">
-                    <a href="#" class="btn btn-primary btn-link">Link <span class="sr-only">(current)</span></a>
-                </li>
-
-                <!--<li class="dropdown">-->
-                    <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
-                    <!--<ul class="dropdown-menu" role="menu">-->
-                        <!--<li><a href="#">Action</a></li>-->
-                        <!--<li><a href="#">Another action</a></li>-->
-                        <!--<li><a href="#">Something else here</a></li>-->
-                        <!--<li class="divider"></li>-->
-                        <!--<li><a href="#">Separated link</a></li>-->
-                        <!--<li class="divider"></li>-->
-                        <!--<li><a href="#">One more separated link</a></li>-->
-                    <!--</ul>-->
+                <!--<li class="active">-->
+                <!--<a href="#" class="">Link <span class="sr-only">(current)</span></a>-->
                 <!--</li>-->
+
+
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a ng-show="!$root.currentUser && !loggingIn" ng-click="$root.logIn(); loggingIn = true" class="btn btn-primary btn-link">
-                        Login
-                    </a>
-                    <a ng-show="!$root.currentUser && loggingIn" class="btn btn-primary btn-link">
-                        <span class="fa fa-circle-o-notch fa-spin"></span>
-                    </a>
-                    <span ng-show="$root.currentUser">
+                <li class="dropdown" ng-show="$root.currentUser">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                         Hello, [[$root.currentUser.profile.name]]
-                    </span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a ui-sref="chat">Chat</a></li>
+                        <li class="divider"></li>
+                        <li><a ui-sref="logout">Logout</a></li>
+                    </ul>
                 </li>
-                <!--<li class="dropdown">-->
-                    <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
+                <li class="active" ng-show="!$root.currentUser">
+                    <a ng-click="$root.loginWithGoogle()">Login</a>
+                </li>
+                <!--<li class="active" ng-show="!$root.currentUser">-->
+                    <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
+                        <!--Login-->
+                        <!--<span class="caret"></span>-->
+                    <!--</a>-->
                     <!--<ul class="dropdown-menu" role="menu">-->
-                        <!--<li><a href="#">Action</a></li>-->
-                        <!--<li><a href="#">Another action</a></li>-->
-                        <!--<li><a href="#">Something else here</a></li>-->
-                        <!--<li class="divider"></li>-->
-                        <!--<li><a href="#">Separated link</a></li>-->
+                        <!--<li><a ng-click="$root.loginWithGoogle()" ui-sref="">Login with Google</a></li>-->
                     <!--</ul>-->
+                    <!---->
                 <!--</li>-->
             </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
 </nav>
 
-  <div class="container" ng-controller="PartiesController">
-      <div class="jumbotron">
-          <h1>Welcome to Meteor! [[2+3]]</h1>
+<div ui-view></div>
 
-          <div class="list-group">
-              <div ng-repeat="item in parties">
-                  <div class="list-group-item">
-                      <div class="row-action-primary">
-                          <i class="mdi-file-folder"></i>
-                      </div>
-                      <div class="row-content">
-                          <div class="least-content" am-time-ago="item.timestamp"></div>
-                          <h4 class="list-group-item-heading" ng-bind="item.author"></h4>
-                          <p class="list-group-item-text" ng-bind-html="item.message | nl2br"></p>
-                      </div>
-                  </div>
-                  <div class="list-group-separator"></div>
-              </div>
-          </div>
-
-          <form ng-submit="add(someValue)">
-              <div class="form-control-wrapper form-group">
-                  <input ng-change="updateErrors()" type="text" class="form-control floating-label" placeholder="User" ng-model="userName"/>
-              </div>
-              <div class="form-control-wrapper form-group">
-                  <textarea msd-elastic ng-change="updateErrors()" class="form-control floating-label" placeholder="Message" ng-model="message"></textarea>
-              </div>
-
-              <button class="btn btn-primary">Add</button>
-          </form>
-          <div class="alert alert-danger" role="alert" ng-show="errors.length">
-              <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-              <span class="sr-only">Error:</span>
-              <span ng-show="errors.items.userName">Enter your name</span>
-              <span ng-show="errors.items.message">Enter message</span>
-          </div>
-          <!--<h1 class="header">Checkbox</h1>-->
-          <!--<h2>Keep Wi-Fi on during sleep</h2>-->
-          <!--<div class="sample1">-->
-              <!--<div class="radio radio-success">-->
-                  <!--<label>-->
-                      <!--<input type="radio" name="sample1" value="option1" checked="">-->
-                      <!--Always-->
-                  <!--</label>-->
-              <!--</div>-->
-              <!--<div class="radio radio-success">-->
-                  <!--<label>-->
-                      <!--<input type="radio" name="sample1" value="option1">-->
-                      <!--Only when plugged in-->
-                  <!--</label>-->
-              <!--</div>-->
-              <!--<div class="radio radio-success">-->
-                  <!--<label>-->
-                      <!--<input type="radio" name="sample1" value="option1">-->
-                      <!--Never-->
-                  <!--</label>-->
-              <!--</div>-->
-          <!--</div>-->
-
-      </div>
-  </div>
-
-  {{> hello}}
 </body>
 
-<template name="hello">
-  <button class="btn btn-primary">Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
-</template>

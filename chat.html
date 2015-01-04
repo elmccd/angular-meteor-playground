@@ -1,0 +1,51 @@
+<template name="chat.html">
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Welcome to Meteor! [[2+3]]</h1>
+
+            <div class="list-group">
+                <div ng-repeat="item in parties">
+                    <div class="list-group-item">
+                        <div class="row-action-primary">
+                            <i class="mdi-file-folder"></i>
+                        </div>
+                        <div class="row-content">
+                            <div class="least-content" am-time-ago="item.timestamp"></div>
+                            <h4 class="list-group-item-heading" ng-bind="item.author"></h4>
+
+                            <p class="list-group-item-text" ng-bind-html="item.message | nl2br"></p>
+                        </div>
+                    </div>
+                    <div class="list-group-separator"></div>
+                </div>
+            </div>
+
+            <form ng-submit="add(someValue)">
+                <div class="form-control-wrapper form-group">
+                    <input ng-change="updateErrors()" type="text" class="form-control floating-label" placeholder="User"
+                           ng-model="userName"/>
+                </div>
+                <div class="form-control-wrapper form-group">
+                <textarea msd-elastic ng-change="updateErrors()" ng-keydown="messageKeyDown($event)" class="form-control floating-label"
+                          placeholder="Message" ng-model="message"></textarea>
+                </div>
+
+                <button class="btn btn-primary">Add</button>
+
+                <div class="togglebutton pull-right">
+                    <label data-toggle="tooltip" data-placement="left" title="Press Enter to send">
+                        <input type="checkbox" checked="" ng-model="submitOnEnter">
+                    </label>
+                </div>
+            </form>
+
+            <div class="alert alert-danger" role="alert" ng-show="errors.length">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                <span ng-show="errors.items.userName">Enter your name</span>
+                <span ng-show="errors.items.message">Enter message</span>
+            </div>
+
+        </div>
+    </div>
+</template>

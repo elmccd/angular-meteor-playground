@@ -57,11 +57,13 @@ spacebars@1.0.4
 spacebars-compiler@1.0.4
 srp@1.0.2
 templating@1.0.10
+tinytest@1.0.4
 tracker@1.0.4
 twbs:bootstrap@3.3.1
 ui@1.0.5
 underscore@1.0.2
 urigo:angular@0.5.11
+urigo:angular-ui-router@0.6.2
 url@1.0.3
 webapp@1.1.5
 webapp-hashing@1.0.2
