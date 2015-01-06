@@ -1,7 +1,8 @@
 Parties = new Mongo.Collection("parties");
+Users = Meteor.users;
 
 if (Meteor.isClient) {
-
+  Meteor.subscribe("userData");
   angular.module('party', ['angular-meteor', 'monospaced.elastic', 'ui.router']);
 
   angular.module("party").config(['$stateProvider', '$urlRouterProvider',
@@ -24,7 +25,7 @@ if (Meteor.isClient) {
           })
           .state('logout', {
             url: "/logout",
-            controller: ['$location', function ($state) {
+            controller: ['$state', function ($state) {
               Meteor.logout();
               $state.go('home')
             }]
@@ -37,10 +38,15 @@ if (Meteor.isClient) {
   });
 
   angular.module('party')
-      .run(function ($rootScope) {
+      .run(function ($rootScope, $collection) {
 
         window.$rootScope = $rootScope;
+
+        $collection(Users).bind($rootScope, 'users', true, true);
+        $collection(Users).bindOne($rootScope, 'me', Meteor.userId());
+
         $rootScope.loginWithGoogle = function () {
+
           return Meteor.loginWithGoogle();
         }
       })
@@ -49,6 +55,7 @@ if (Meteor.isClient) {
         $timeout(function () {
           $.material.init();
           $('[data-toggle]').tooltip();
+          $('.perfect-scrollbar').perfectScrollbar();
         });
 
         $scope.parties = [];
@@ -72,20 +79,31 @@ if (Meteor.isClient) {
             $scope.errors.length += 1;
           }
 
-          if ($scope.userName === '') {
-            $scope.errors.items.userName = true;
-            $scope.errors.length += 1;
-          }
 
           if ($scope.errors.length) {
             return false;
           }
 
           $scope.parties.push({
-            author: $scope.userName,
+            author: Meteor.user().services.google,
             message: $scope.message,
             timestamp: new Date()
           });
+
+          $scope.$watchCollection('parties', function () {
+            console.log('changed!');
+            $timeout(function () {
+              if ($rootScope.me.settings.autoScroll) {
+                $('.perfect-scrollbar').stop(true).animate({
+                  scrollTop: $('.perfect-scrollbar > *').height()
+                }, {
+                  duration: 1000,
+                  easing: 'linear'
+                });
+              }
+            });
+          });
+
 
           $scope.message = '';
         };
@@ -98,8 +116,13 @@ if (Meteor.isClient) {
 
         };
 
+        $scope.setSetting = function (name, value) {
+          console.log(name, value);
+          Meteor.call('setSetting', name, value);
+        };
+
         $scope.messageKeyDown = function (event) {
-          if (event.which === 13 && $scope.submitOnEnter) {
+          if (event.which === 13 && $rootScope.me.settings.submitOnEnter) {
             event.preventDefault();
 
             $scope.add();
@@ -118,7 +141,7 @@ if (Meteor.isClient) {
     };
   });
 
-  angular.module('party').directive("amTimeAgo", function($window) {
+  angular.module('party').directive("amTimeAgo", function($window, $interval) {
     return {
       scope: {
         amTimeAgo: '='
@@ -127,9 +150,15 @@ if (Meteor.isClient) {
         var time = moment(scope.amTimeAgo);
         element.text(time.fromNow());
 
-        $window.setInterval(function () {
+        var interval = $interval(function () {
           element.text(time.fromNow());
-        }, 60);
+          console.log('update')
+        }, 60e3);
+
+        scope.$on("$destroy", function() {
+          $interval.cancel(interval)
+        });
+
       }
     }
   });
@@ -138,7 +167,11 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    Parties.remove({});
+
+
+
+    //Parties.remove({});
+
     if (Parties.find().count() === 0) {
 
       var parties = [];
@@ -152,8 +185,58 @@ if (Meteor.isServer) {
     }
   });
 
+
+  Meteor.methods({
+    setSetting: function (name, value) {
+      console.log(Meteor.userId());
+
+      var updateObject = {};
+      updateObject["settings." + name] = value;
+
+      Meteor.users.update({_id: Meteor.userId()}, {
+        $set: updateObject
+      });
+    }
+  });
+
+  Meteor.users.allow({
+    update: function (userId, User) {
+      console.log(userId, User);
+      return false;
+    }
+  });
+
   Meteor.publish("parties", function () {
     return Parties.find();
+  });
+
+  Meteor.publish('users', function () {
+    return Meteor.users.find({}, {
+      fields: {
+        'profile': 1,
+        'services': 1,
+        'settings': 1
+      }
+    });
+  });
+
+  Meteor.publish('me', function () {
+    return Meteor.users.find({_id: Meteor.userId()}, {
+      fields: {
+        'profile': 1,
+        'services': 1,
+        'settings': 1
+      }
+    });
+  });
+
+  Meteor.publish("userData", function () {
+    if (this.userId) {
+      return Meteor.users.find({_id: this.userId},
+          {fields: {'services': 1, 'others': 1}});
+    } else {
+      this.ready();
+    }
   });
 
 // first, remove configuration entry in case service is already configured

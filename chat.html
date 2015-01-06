@@ -1,30 +1,40 @@
 <template name="chat.html">
     <div class="container">
         <div class="jumbotron">
-            <h1>Welcome to Meteor! [[2+3]]</h1>
 
-            <div class="list-group">
-                <div ng-repeat="item in parties">
-                    <div class="list-group-item">
-                        <div class="row-action-primary">
-                            <i class="mdi-file-folder"></i>
-                        </div>
-                        <div class="row-content">
-                            <div class="least-content" am-time-ago="item.timestamp"></div>
-                            <h4 class="list-group-item-heading" ng-bind="item.author"></h4>
+            <style>
+                .perfect-scrollbar-wrap {
+                    position: relative;
+                }
+                .list-group {
+                    max-height: calc(100vh - 300px);
+                    min-height: 200px;
+                    overflow: hidden;
+                    position: relative;
+                }
+            </style>
+            <div class="perfect-scrollbar-wrap">
+                <div class="list-group perfect-scrollbar">
+                    <div class="perfect-scrollbar-inner">
+                        <div ng-repeat="item in parties">
+                            <div class="list-group-item">
+                                <div class="row-action-primary">
+                                    <img class="circle" ng-src="[[item.author.picture]]" alt=""/>
+                                </div>
+                                <div class="row-content">
+                                    <div class="least-content" am-time-ago="item.timestamp"></div>
+                                    <h4 class="list-group-item-heading" ng-bind="item.author.name"></h4>
 
-                            <p class="list-group-item-text" ng-bind-html="item.message | nl2br"></p>
+                                    <p class="list-group-item-text" ng-bind-html="item.message | nl2br"></p>
+                                </div>
+                            </div>
+                            <div class="list-group-separator"></div>
                         </div>
                     </div>
-                    <div class="list-group-separator"></div>
                 </div>
             </div>
 
             <form ng-submit="add(someValue)">
-                <div class="form-control-wrapper form-group">
-                    <input ng-change="updateErrors()" type="text" class="form-control floating-label" placeholder="User"
-                           ng-model="userName"/>
-                </div>
                 <div class="form-control-wrapper form-group">
                 <textarea msd-elastic ng-change="updateErrors()" ng-keydown="messageKeyDown($event)" class="form-control floating-label"
                           placeholder="Message" ng-model="message"></textarea>
@@ -32,17 +42,34 @@
 
                 <button class="btn btn-primary">Add</button>
 
-                <div class="togglebutton pull-right">
-                    <label data-toggle="tooltip" data-placement="left" title="Press Enter to send">
-                        <input type="checkbox" checked="" ng-model="submitOnEnter">
-                    </label>
+
+                <div class="pull-right">
+
+                    <div class="togglebutton">
+                        <label data-toggle="tooltip" data-placement="left" title="Press Enter to send">
+
+                            <input type="checkbox" checked=""
+                                   ng-model="$root.me.settings.submitOnEnter"
+                                   ng-change="setSetting('submitOnEnter', $root.me.settings.submitOnEnter)">
+                            Press Enter to send
+                        </label>
+                    </div>
+
+                    <div class="togglebutton">
+                        <label data-toggle="tooltip" data-placement="left" title="Press Enter to send">
+
+                            <input type="checkbox" checked=""
+                                   ng-model="$root.me.settings.autoScroll"
+                                   ng-change="setSetting('autoScroll', $root.me.settings.autoScroll)">
+                            Auto scroll
+                        </label>
+                    </div>
                 </div>
             </form>
 
             <div class="alert alert-danger" role="alert" ng-show="errors.length">
                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                 <span class="sr-only">Error:</span>
-                <span ng-show="errors.items.userName">Enter your name</span>
                 <span ng-show="errors.items.message">Enter message</span>
             </div>
 
