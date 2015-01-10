@@ -1,0 +1,10 @@
+.perfect-scrollbar-wrap {
+    position: relative;
+}
+
+.list-group {
+    max-height: calc(100vh - 300px);
+    min-height: 200px;
+    overflow: hidden;
+    position: relative;
+}

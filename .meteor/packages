@@ -8,10 +8,10 @@ meteor-platform
 urigo:angular
 fezvrasta:bootstrap-material-design
 twbs:bootstrap
-momentjs:moment
 accounts-password
 accounts-google
 accounts-base
 service-configuration
 natestrauser:font-awesome
 urigo:angular-ui-router
+momentjs:moment
