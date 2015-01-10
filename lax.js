@@ -3,7 +3,15 @@ Users = Meteor.users;
 
 if (Meteor.isClient) {
   Meteor.subscribe("userData");
-  angular.module('party', ['angular-meteor', 'monospaced.elastic', 'ui.router']);
+  angular.module('party', [
+
+      'angular-meteor',
+      'monospaced.elastic',
+      'ui.router',
+
+      'header-bar',
+      'chat-item'
+  ]);
 
   angular.module("party").config(['$stateProvider', '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
@@ -33,12 +41,8 @@ if (Meteor.isClient) {
     }
   ]);
 
-  Meteor.startup(function () {
-    angular.bootstrap(document, ['party']);
-  });
-
   angular.module('party')
-      .run(function ($rootScope, $collection) {
+      .run(['$rootScope', '$collection', function ($rootScope, $collection) {
 
         window.$rootScope = $rootScope;
 
@@ -49,8 +53,8 @@ if (Meteor.isClient) {
 
           return Meteor.loginWithGoogle();
         }
-      })
-      .controller('PartiesController', function ($scope, $collection, $timeout) {
+      }])
+      .controller('PartiesController', ['$scope', '$collection', '$timeout', function ($scope, $collection, $timeout) {
 
         $timeout(function () {
           $.material.init();
@@ -68,8 +72,6 @@ if (Meteor.isClient) {
 
         $scope.userName = '';
         $scope.message = '';
-
-        $scope.submitOnEnter = false;
 
         $scope.add = function () {
 
@@ -90,23 +92,23 @@ if (Meteor.isClient) {
             timestamp: new Date()
           });
 
-          $scope.$watchCollection('parties', function () {
-            console.log('changed!');
-            $timeout(function () {
-              if ($rootScope.me.settings.autoScroll) {
-                $('.perfect-scrollbar').stop(true).animate({
-                  scrollTop: $('.perfect-scrollbar > *').height()
-                }, {
-                  duration: 1000,
-                  easing: 'linear'
-                });
-              }
-            });
-          });
-
-
           $scope.message = '';
         };
+
+        $scope.$watchCollection('parties', function () {
+          console.log('changed!');
+          $timeout(function () {
+            if ($rootScope.me.settings && $rootScope.me.settings.autoScroll) {
+              $('.perfect-scrollbar').scrollTop($('.perfect-scrollbar > *').height());
+            }
+          }, 100);
+        });
+
+
+        $timeout(function () {
+          console.log('ddd');
+          $('.perfect-scrollbar').scrollTop($('.perfect-scrollbar > *').height());
+        }, 100);
 
         $scope.updateErrors = function () {
           $scope.errors = {
@@ -130,18 +132,18 @@ if (Meteor.isClient) {
           }
         }
 
-      });
+      }]);
 
-  angular.module('party').filter("nl2br", function($sce) {
+  angular.module('party').filter("nl2br", ['$sce', function($sce) {
     return function(data) {
       if (!data) {
         return $sce.trustAsHtml('');
       }
       return $sce.trustAsHtml(data.replace(/\n\r?/g, '<br />'));
     };
-  });
+  }]);
 
-  angular.module('party').directive("amTimeAgo", function($window, $interval) {
+  angular.module('party').directive("amTimeAgo", ['$window', '$interval', function($window, $interval) {
     return {
       scope: {
         amTimeAgo: '='
@@ -161,13 +163,15 @@ if (Meteor.isClient) {
 
       }
     }
-  });
+  }]);
+
+
 
 }
 
 if (Meteor.isServer) {
+  console.log('sdsd');
   Meteor.startup(function () {
-
 
 
     //Parties.remove({});
@@ -239,7 +243,6 @@ if (Meteor.isServer) {
     }
   });
 
-// first, remove configuration entry in case service is already configured
   ServiceConfiguration.configurations.remove({
     service: "google"
   });
@@ -247,7 +250,8 @@ if (Meteor.isServer) {
   ServiceConfiguration.configurations.insert({
     service: "google",
     clientId: "932042629989-1qcug99s1b16t127klcn143k17rm0adq.apps.googleusercontent.com",
-    secret: "EaOX0amfo7UFFuQ06JuQtPOY"
+    secret: "T6jb3t7U3SNAbgT5Y5K3DGjN"
   });
+
 
 }

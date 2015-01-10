@@ -16,25 +16,11 @@
             <div class="perfect-scrollbar-wrap">
                 <div class="list-group perfect-scrollbar">
                     <div class="perfect-scrollbar-inner">
-                        <div ng-repeat="item in parties">
-                            <div class="list-group-item">
-                                <div class="row-action-primary">
-                                    <img class="circle" ng-src="[[item.author.picture]]" alt=""/>
-                                </div>
-                                <div class="row-content">
-                                    <div class="least-content" am-time-ago="item.timestamp"></div>
-                                    <h4 class="list-group-item-heading" ng-bind="item.author.name"></h4>
-
-                                    <p class="list-group-item-text" ng-bind-html="item.message | nl2br"></p>
-                                </div>
-                            </div>
-                            <div class="list-group-separator"></div>
-                        </div>
+                        <chat-item ng-repeat="item in parties"></chat-item>
                     </div>
                 </div>
             </div>
-
-            <form ng-submit="add(someValue)">
+            <form ng-submit="add(someValue)" ng-show="$root.currentUser">
                 <div class="form-control-wrapper form-group">
                 <textarea msd-elastic ng-change="updateErrors()" ng-keydown="messageKeyDown($event)" class="form-control floating-label"
                           placeholder="Message" ng-model="message"></textarea>
