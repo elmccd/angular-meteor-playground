@@ -10,7 +10,8 @@ if (Meteor.isClient) {
 
         'header-bar',
         'chat',
-        'user'
+        'user',
+        'board'
     ]);
 
     angular.module("party")
